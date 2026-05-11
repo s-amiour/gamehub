@@ -7,11 +7,12 @@
 
 ## Objective
 
-Before writing a single line of code, you need to design the system on paper. Every decision you make here — where to draw service boundaries, who owns what data, how services talk to each other — is hard to reverse once you start coding.
+Before writing a single line of code, you need to design the system on paper. Every decision you make here: where to draw service boundaries, who owns what data, how services talk to each other, is hard to reverse once you start coding.
 
 This module is about slowing down and thinking like an architect, not a developer.
 
 Read these two documents before doing anything else:
+
 - `docs/domain.md` — what GameHub is and who uses it
 - `docs/specs.md` — the tech stack and key architectural decisions
 
@@ -19,23 +20,23 @@ Read these two documents before doing anything else:
 
 ---
 
-## Task 1 — Identify bounded contexts *(~40 min)*
+## Task 1 — Identify bounded contexts _(~40 min)_
 
 A bounded context is a part of the system that has a clear responsibility and owns its data exclusively. No other service should reach into its database.
 
 For each bounded context you identify, fill in the table:
 
-| Bounded Context | Responsibilities | Owned Entities | Team |
-|---|---|---|---|
-| Identity | Manages who users are, handles registration and profiles | User, Session | Platform |
-| Game Library | *(fill in)* | *(fill in)* | *(fill in)* |
-| *(add more)* | | | |
+| Bounded Context | Responsibilities                                         | Owned Entities | Team        |
+| --------------- | -------------------------------------------------------- | -------------- | ----------- |
+| Identity        | Manages who users are, handles registration and profiles | User, Session  | Platform    |
+| Game Library    | _(fill in)_                                              | _(fill in)_    | _(fill in)_ |
+| _(add more)_    |                                                          |                |             |
 
-There is no single correct answer — what matters is that you can justify each row.
+There is no single correct answer: what matters is that you can justify each row.
 
 ---
 
-## Task 2 — Define service contracts *(~30 min)*
+## Task 2 — Define service contracts _(~30 min)_
 
 For each pair of services that need to communicate, define:
 
@@ -45,6 +46,7 @@ For each pair of services that need to communicate, define:
 - **Payload**: key fields exchanged
 
 Example:
+
 ```
 activity-service → logging-service
 Trigger: an activity is logged
@@ -56,9 +58,10 @@ Focus on the flows that feel non-obvious. You do not need to document every poss
 
 ---
 
-## Task 3 — Draw the service map *(~20 min)*
+## Task 3 — Draw the service map _(~20 min)_
 
 Draw the full GameHub service map:
+
 - One box per service
 - Arrows between services (solid line = synchronous REST, dashed line = async event)
 - Label each arrow with its protocol
@@ -68,7 +71,7 @@ This can be a sketch on paper, a whiteboard photo, or ASCII art committed to you
 
 ---
 
-## Discussion *(~15 min)*
+## Discussion _(~15 min)_
 
 Three questions to discuss as a team before you leave:
 
