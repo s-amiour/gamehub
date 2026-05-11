@@ -184,3 +184,13 @@ docker compose \
 | 8004 | notification-service |
 | 8005 | auth-service |
 | 8006 | logging-service |
+
+---
+
+## Languages
+
+This is a Python-first course. The language breakdown GitHub shows includes:
+
+- **Python** — all microservices and the gateway
+- **JavaScript / Node.js** — notification-service only
+- **Go Template** — Helm chart templates used in the Module 8 instructor demo (Kubernetes walkthrough). Helm uses Go's templating syntax; there is no Go code in this project.
