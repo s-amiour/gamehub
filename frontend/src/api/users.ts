@@ -1,4 +1,7 @@
 import { api } from './client'
+import { mockUsersApi } from './mock'
+
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
 export interface User {
   id: string
@@ -21,7 +24,7 @@ export interface UserCreate {
   password: string
 }
 
-export const usersApi = {
+export const usersApi = USE_MOCK ? mockUsersApi : {
   list: (limit = 20, offset = 0) =>
     api.get<UserList>(`/v1/users?limit=${limit}&offset=${offset}`),
 

@@ -1,4 +1,7 @@
 import { api } from './client'
+import { mockGamesApi } from './mock'
+
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
 export interface Game {
   id: string
@@ -25,7 +28,7 @@ export interface GameCreate {
   cover_url?: string
 }
 
-export const gamesApi = {
+export const gamesApi = USE_MOCK ? mockGamesApi : {
   list: (limit = 20, offset = 0) =>
     api.get<GameList>(`/v1/games?limit=${limit}&offset=${offset}`),
 
