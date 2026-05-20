@@ -1,3 +1,1 @@
-# This file is intentionally empty.
-# Its presence tells Python that `app` is a package,
-# allowing imports like `from app.database import get_db`.
+# allows imports following `from app.database import get_db` syntax.
