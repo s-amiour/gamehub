@@ -1,7 +1,7 @@
 # Module 2 — FastAPI Service Design
 
 **Duration**: 2h in class
-**Branch to submit**: `module-02/<team-name>`
+**Branch to submit**: `module-02/s-amiour`
 
 ---
 
@@ -10,6 +10,7 @@
 You will build two services: explore the fully-built `user-service` as a reference, then build `game-service` yourself using the same structure. By the end of this module, both services run locally and respond to requests.
 
 The architecture separates concerns into four layers:
+
 - **models** — SQLAlchemy ORM model (what the DB table looks like)
 - **schemas** — Pydantic DTOs (what the API sends and receives)
 - **repository** — raw DB queries, no business logic
@@ -23,6 +24,7 @@ The architecture separates concerns into four layers:
 `user-service` is fully implemented and documented. Read it before building anything — every file is annotated to explain its role and what belongs there.
 
 Start it with:
+
 ```bash
 cd services/user-service
 cp .env.example .env
@@ -33,7 +35,7 @@ alembic upgrade head
 uvicorn app.main:app --reload --port 8001
 ```
 
-Open http://localhost:8001/docs and try the endpoints before writing any code.
+Open `http://localhost:8001/docs` and try the endpoints before writing any code.
 
 The full file-by-file breakdown of `user-service` is in `services/user-service/README.md`. Read it — it explains what each file does and why.
 
@@ -43,7 +45,7 @@ The full file-by-file breakdown of `user-service` is in `services/user-service/R
 
 Both `user-service` and `game-service` follow the same layout:
 
-```
+```struct
 <service-name>/
 ├── app/
 │   ├── __init__.py        # empty, makes app a package
@@ -87,6 +89,7 @@ Your service must expose these four endpoints:
 For the search endpoint, use SQLAlchemy's `ilike` operator — it does a case-insensitive partial match.
 
 Run it on port 8002:
+
 ```bash
 cd services/game-service
 cp .env.example .env
@@ -109,12 +112,14 @@ curl http://localhost:8002/v1/games
 Both should return a valid JSON response (empty list is fine).
 
 Run the tests:
+
 ```bash
 cd services/user-service && pytest tests/ -v
 cd services/game-service && pytest tests/ -v
 ```
 
 Check linting before you push — CI enforces both of these:
+
 ```bash
 cd services/game-service
 ruff check app/

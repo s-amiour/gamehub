@@ -1,11 +1,7 @@
-## YOU NEED TO COMMIT THIS FILE BEFORE MOVING ON TO THE NEXT MODULE ! 🚨
-
-**feel free to delete this comment**
-
 # Module 1 — Reflection
 
-**Team name**: **\*\***\_\_\_**\*\***
-**Branch**: `module-01/<team-name>`
+**Team name**: `s-amiour`
+**Branch**: `module-01/s-amiour`
 **Submitted**: before Module 2 lesson
 
 ---
@@ -22,7 +18,7 @@ You started from a painful monolith. Now you're splitting it into separate servi
 
 Think about it from three angles: the developer who has to change code, the team that has to deploy it, and the user who has to live with its failures. You don't need to cover all three, pick the one that felt most real to you today.
 
-> _Your answer:_
+> From the user's perspective, this split solves the problem of total system failure. In a monolith, a memory leak or infinite loop in the notification engine would crash the entire application, kicking users offline and breaking gameplay tracking.
 
 ---
 
@@ -34,7 +30,7 @@ Look at your service map. Every arrow between two services is a decision someone
 
 What would break, slow down, or become harder to manage if you merged those two services back together?
 
-> _Your answer:_
+> `activity-service` and `logging-service`. I separated them because they change for entirely different reasons: activity => product features, while logging => legal and compliance requirements. If they were merged, every tweak to compliance rules would risk introducing bugs into core gameplay tracking loop.
 
 ---
 
@@ -46,7 +42,7 @@ Microservices solve the monolith's problems. But they create new ones.
 
 No need to solve it: just name it honestly. This is exactly the tension the rest of the course is about.
 
-> _Your answer:_
+> Debugging.. tracing a request end-to-end is now harder. In a monolith, an error provides a clear trace. Now, if a request like user finishing a game but their friends aren't notified, the bug could be hidden in any service.
 
 ---
 
