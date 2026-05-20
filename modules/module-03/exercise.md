@@ -7,7 +7,7 @@
 
 ## Objective
 
-Services need to talk to each other. In this module you wire up the `activity-service` to call `user-service` and `game-service`, and you build the gateway that became the entry point on your Module 1 service map.
+Services need to talk to each other. In this module you build the gateway that became the entry point on your Module 1 service map, then wire up `activity-service` to call `user-service` and `game-service` through it.
 
 By the end of this module, all client requests go through port 8000. No client ever calls a service on its own port again.
 
@@ -37,6 +37,29 @@ ROUTES = {
 
 When a request arrives at `/v1/users/123`, the gateway splits the path, finds `users` in the dictionary, and forwards the full request to `http://localhost:8001/v1/users/123` — method, headers, and body preserved exactly.
 
+Edge cases to handle:
+
+- Unknown resource → `404`
+- Downstream service unreachable → `503 Service Unavailable`
+- `/health` → handled by the gateway itself, never forwarded
+
+Once the gateway is implemented, start user-service, game-service, and the gateway, then verify the two existing services route correctly before moving on:
+
+```bash
+uvicorn app.main:app --reload --port 8000  # gateway
+uvicorn app.main:app --reload --port 8001  # user-service
+uvicorn app.main:app --reload --port 8002  # game-service
+```
+
+```bash
+curl http://localhost:8000/health        # {"status": "ok"}
+curl http://localhost:8000/v1/users      # proxied to user-service
+curl http://localhost:8000/v1/games      # proxied to game-service
+curl http://localhost:8000/v1/unknown    # 404
+```
+
+Only move to Part B once these pass.
+
 ---
 
 ## Part B — Wire up the activity-service _(~50 min)_
@@ -53,50 +76,22 @@ These two calls are handled differently on purpose:
 
 Open `services/activity-service/app/main.py` and implement both functions. The signatures and the expected response shape are documented in `docs/api-contracts.md`.
 
-Start all three services before testing:
+Once implemented, start activity-service and add it to the running stack:
 
 ```bash
-uvicorn app.main:app --reload --port 8001  # user-service
-uvicorn app.main:app --reload --port 8002  # game-service
 uvicorn app.main:app --reload --port 8003  # activity-service
 ```
 
-Test the flow:
+Test the full flow through the gateway:
 
 ```bash
 # Create a user first, then log an activity for that user
-curl -X POST http://localhost:8003/v1/activities \
+curl -X POST http://localhost:8000/v1/activities \
   -H "Content-Type: application/json" \
   -d '{"user_id": "<your-user-id>", "game_id": "<your-game-id>", "action": "played"}'
 ```
 
 Check that the response includes the enriched `game` object. Then stop `game-service` and repeat — confirm the activity is still saved with `"game": null`.
-
----
-
-Rules to implement:
-
-- Unknown resource → `404`
-- Downstream service unreachable → `503 Service Unavailable`
-- `/health` → handled by the gateway itself, never forwarded
-
-Start everything:
-
-```bash
-uvicorn app.main:app --reload --port 8000  # gateway
-uvicorn app.main:app --reload --port 8001  # user-service
-uvicorn app.main:app --reload --port 8002  # game-service
-uvicorn app.main:app --reload --port 8003  # activity-service
-```
-
-From this point on, all calls go through port 8000:
-
-```bash
-curl http://localhost:8000/health
-curl http://localhost:8000/v1/users
-curl http://localhost:8000/v1/games
-curl http://localhost:8000/v1/activities
-```
 
 ---
 
