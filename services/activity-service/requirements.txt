@@ -7,3 +7,4 @@ python-dotenv
 httpx
 aio-pika
 aiosqlite
+asyncpg
