@@ -1,7 +1,7 @@
 # Module 3 — Reflection
 
-**Team name**: _______________
-**Branch**: `module-03/<team-name>`
+**Team name**: s-amiour
+**Branch**: `module-03/s-amiour`
 **Submitted**: before Module 4 lesson
 
 ---
@@ -18,7 +18,7 @@ All client requests now go through the gateway. No client ever calls a service d
 
 Think about what the client would need to know and manage if it talked to each service on its own port.
 
-> *Your answer:*
+> API gateway simplifies client communication by acting as a unified entry point (port 8000). Without it, clients would need to track the specific ports of every backend service, causing significant maintenance overhead whenever services are added or relocated.
 
 ---
 
@@ -30,7 +30,7 @@ The activity-service makes two outbound calls: one to validate the user (with re
 
 What is the consequence for the user in each case if the downstream service is unavailable?
 
-> *Your answer:*
+> User validation is a strict dependency. The activity must not be saved if the user does not exist, as this prevents invalid data entry. Fetching game details is supplementary. If the game service fails, the activity should still be saved with null value for game data, ensuring the primary operation succeeds without unnecessary disruption.
 
 ---
 
@@ -42,7 +42,7 @@ Every time a client creates an activity, three services are involved synchronous
 
 What happens to the user experience if the slowest service in the chain takes 3 seconds to respond?
 
-> *Your answer:*
+> While synchronizing calls simplifies the system, it creates a bottleneck. You cannot access any data until all data is ready, meaning a single slow service forces the entire system to wait those full 3 seconds. Waiting >= 3 secs is, as you know, a disincentive for the user.
 
 ---
 
