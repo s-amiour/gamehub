@@ -1,0 +1,4 @@
+-r requirements.txt  # Tells pip to also install the main requirements
+pytest
+httpx
+pytest-cov
