@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+# Schemas to validate DB operations' payloads
+
 class UserCreate(BaseModel):
     username: str
     email: str

@@ -7,7 +7,11 @@ router = APIRouter(prefix="/v1/users", tags=["users"])
 
 @router.post("/", response_model=schemas.UserOut, status_code=201)
 def create_user(data: schemas.UserCreate, db: Session = Depends(get_db)):
-    return service.add_user(db, data)
+    try:
+        return service.add_user(db, data)
+    except ValueError as e:
+        # Due to possibly duplicate resources for unique fields
+        raise HTTPException(status_code=409, detail=str(e))
 
 @router.get("/", response_model=schemas.UserList)
 def list_users(limit: int = 20, offset: int = 0, db: Session = Depends(get_db)):
