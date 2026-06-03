@@ -112,15 +112,19 @@ async def list_user_activities(
     user_id: str, limit: int = 20, offset: int = 0, db: Session = Depends(get_db)
 ):
     activities, total = repository.list_user_activities(db, user_id, limit=limit, offset=offset)
-    items = []
-    for a in activities:
-        game_data = await fetch_game(a.game_id)
-        items.append({
-            "id": a.id,
-            "user_id": a.user_id,
-            "action": a.action,
-            "duration_minutes": a.duration_minutes,
-            "created_at": a.created_at,
-            "game": game_data,
-        })
-    return schemas.ActivityList(items=items, total=total, limit=limit, offset=offset)
+    return {
+        "items": [
+            {
+                "id": a.id,
+                "user_id": a.user_id,
+                "action": a.action,
+                "duration_minutes": a.duration_minutes,
+                "created_at": a.created_at,
+                "game": await fetch_game(a.game_id),
+            }
+            for a in activities
+        ],
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }
