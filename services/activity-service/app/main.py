@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import Base, engine, get_db
+from app.infrastructure.rabbitmq_publisher import publish_activity_event
 from app import repository, schemas
 
 Base.metadata.create_all(bind=engine)
@@ -80,6 +81,20 @@ async def create_activity(data: schemas.ActivityCreate, db: Session = Depends(ge
     await validate_user(data.user_id)
     activity = repository.create_activity(db, data)
     game_data = await fetch_game(activity.game_id)
+
+    try:
+        game_title = game_data["title"] if game_data else None
+        await publish_activity_event(
+            user_id=activity.user_id,
+            game_id=activity.game_id,
+            action=activity.action,
+            game_title=game_title,
+        )
+    except Exception:
+        # Catch any broker failure to ensure our primary HTTP response 
+        # succeeds even if the downstream notification worker is failing.
+        pass
+
     return {
         "id": activity.id,
         "user_id": activity.user_id,

@@ -6,9 +6,7 @@ class Settings(BaseSettings):
     user_service_url: str = "http://localhost:8001"
     game_service_url: str = "http://localhost:8002"
     activity_service_url: str = "http://localhost:8003"
-
-    # Added in Module 4
-    # notification_service_url: str = "http://localhost:8004"
+    notification_service_url: str = "http://localhost:8004"
 
     # Added in Module 5
     # logging_service_url: str = "http://localhost:8006"
