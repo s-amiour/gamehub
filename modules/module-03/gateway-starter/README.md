@@ -6,9 +6,9 @@ Single entry point for all client requests from Module 3 onward. Routes by path 
 
 ```bash
 # From the repo root, copy this starter into place first:
-cp -r modules/module-03/gateway-starter gateway
+cp -r modules/module-03/gateway-starter services/gateway
 
-cd gateway
+cd services/gateway
 cp .env.example .env
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
