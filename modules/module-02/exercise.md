@@ -31,6 +31,7 @@ cp .env.example .env
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+alembic revision <description_of_change>  # when applicable
 alembic upgrade head
 uvicorn app.main:app --reload --port 8001
 ```
@@ -96,6 +97,7 @@ cp .env.example .env
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+alembic revision <description_of_change>  # when applicable
 alembic upgrade head
 uvicorn app.main:app --reload --port 8002
 ```

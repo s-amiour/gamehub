@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import Base, engine, get_db
+from app.infrastructure.rabbitmq_publisher import publish_activity_event
 from app import repository, schemas
 
 Base.metadata.create_all(bind=engine)
@@ -80,6 +81,20 @@ async def create_activity(data: schemas.ActivityCreate, db: Session = Depends(ge
     await validate_user(data.user_id)
     activity = repository.create_activity(db, data)
     game_data = await fetch_game(activity.game_id)
+
+    try:
+        game_title = game_data["title"] if game_data else None
+        await publish_activity_event(
+            user_id=activity.user_id,
+            game_id=activity.game_id,
+            action=activity.action,
+            game_title=game_title,
+        )
+    except Exception:
+        # Catch any broker failure to ensure our primary HTTP response 
+        # succeeds even if the downstream notification worker is failing.
+        pass
+
     return {
         "id": activity.id,
         "user_id": activity.user_id,
@@ -112,15 +127,19 @@ async def list_user_activities(
     user_id: str, limit: int = 20, offset: int = 0, db: Session = Depends(get_db)
 ):
     activities, total = repository.list_user_activities(db, user_id, limit=limit, offset=offset)
-    items = []
-    for a in activities:
-        game_data = await fetch_game(a.game_id)
-        items.append({
-            "id": a.id,
-            "user_id": a.user_id,
-            "action": a.action,
-            "duration_minutes": a.duration_minutes,
-            "created_at": a.created_at,
-            "game": game_data,
-        })
-    return schemas.ActivityList(items=items, total=total, limit=limit, offset=offset)
+    return {
+        "items": [
+            {
+                "id": a.id,
+                "user_id": a.user_id,
+                "action": a.action,
+                "duration_minutes": a.duration_minutes,
+                "created_at": a.created_at,
+                "game": await fetch_game(a.game_id),
+            }
+            for a in activities
+        ],
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }

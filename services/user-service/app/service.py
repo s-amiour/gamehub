@@ -1,4 +1,6 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+
 from app import repository
 from app.schemas import UserCreate, UserOut, UserList
 
@@ -8,8 +10,12 @@ def _hash_password(plain: str) -> str:
 
 def add_user(db: Session, data: UserCreate) -> UserOut:
     hashed = _hash_password(data.password)
-    user = repository.create_user(db, data, hashed)
-    return UserOut.model_validate(user)
+    try:
+        user = repository.create_user(db, data, hashed)
+        return UserOut.model_validate(user)
+    except IntegrityError:
+        db.rollback()  # Reset the session state
+        raise ValueError("Username or email already exists")
 
 def fetch_user(db: Session, user_id: str) -> UserOut:
     user = repository.get_user(db, user_id)
