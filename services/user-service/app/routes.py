@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app import service, schemas
 
-router = APIRouter(prefix="/v1/users", tags=["users"])
+router = APIRouter(prefix="/v1/users", tags=["users"])  # Used to group path operations, for example to structure an app in multiple files.
 
 @router.post("/", response_model=schemas.UserOut, status_code=201)
 def create_user(data: schemas.UserCreate, db: Session = Depends(get_db)):
