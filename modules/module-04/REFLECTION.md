@@ -1,7 +1,7 @@
 # Module 4 — Reflection
 
-**Team name**: _______________
-**Branch**: `module-04/<team-name>`
+**Team name**: s-amiour
+**Branch**: `module-04/s-amiour`
 **Submitted**: before Module 5 lesson
 
 ---
@@ -18,7 +18,7 @@ In Module 3, services called each other directly over HTTP. Now activity-service
 
 Think about what happens under load, or when notification-service is temporarily down.
 
-> *Your answer:*
+> Speed and resilience. It can quickly respond to the user and won't fail or slow down just because a secondary feature is struggling. The notification-service gains the advantage of not getting overwhelmed by concurrent requests as a result of pulling messages from the queue at a steady pace, preventing crashes.
 
 ---
 
@@ -30,7 +30,7 @@ In Module 3 you already knew how to call another service directly over HTTP — 
 
 Think about what happens if notification-service is slow, or crashes mid-message.
 
-> *Your answer:*
+> Again, it all comes down to the criticality of the features: user validation is a strict dependency for the activity to be created, whereas notifying the user isn't. So, in order to guarantee an efficient performance of activity creation, especiially in high traffic conditions, we must asynchronously publish notifications. In addition, the broker provides us a safety net: if the notification-service crashes mid-message, RabbitMQ simply holds onto the pending messages until the service is back online.
 
 ---
 
@@ -42,7 +42,7 @@ With synchronous REST, you get an immediate answer: success or failure. With asy
 
 What visibility do you lose when you go async?
 
-> *Your answer:*
+> A user wouldn't immediately know a notification failed; they would only notice the absence of an alert on their friend's screen. Unlike Sync messaging, we don't get the 500 error. Because activity-service only knows if RabbitMQ accepted the message, we have to rely on secondary monitoring tools like RabbitMQ's Dead Letter Queues or server logs.
 
 ---
 

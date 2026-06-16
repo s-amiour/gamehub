@@ -1,7 +1,7 @@
 # Module 4 — Asynchronous Messaging
 
 **Duration**: 2h in class
-**Branch to submit**: `module-04/<team-name>`
+**Branch to submit**: `module-04/s-amiour`
 
 ---
 
@@ -89,13 +89,15 @@ curl http://localhost:8000/v1/notifications
 ## Discussion *(~15 min)*
 
 - What happens to the activity request if `notification-service` is down when the message is published? Should the activity creation fail?
+> If the notification-service is down, the message simply rests safely in the RabbitMQ queue (gamehub.notifications) until the service comes back online to consume it. The activity creation should not fail as asynchronously decoupled due to RabbitMQ.
 - In Module 3, you called `game-service` directly over HTTP to enrich the response. Why not do the same for notifications — why introduce a broker at all?
+> We use a broker because a notification is a fire-and-forget process. If we used a synchronous HTTP call, activity-service would be forced to wait for notification-service to process the alert, increasing latency and tightly coupling the two services, which leads to lower UX.
 - The activity is saved and the message is sent — but you have no confirmation the notification was delivered. What visibility do you lose compared to a synchronous call?
-
+> We lose immediate end-to-end failure feedback. In a synchronous HTTP call, you instantly receive status code of the downstream action. With a message broker, the activity-service only knows the message was accepted by RabbitMQ, not whether the notification-service processed it successfully.
 ---
 
 ## Minimum to submit this branch
 
-- [ ] Activity creation publishes a RabbitMQ message — visible in the management UI
-- [ ] `notification-service` registered in the gateway and reachable via port 8000
-- [ ] `REFLECTION.md` completed and committed
+- [x] Activity creation publishes a RabbitMQ message — visible in the management UI
+- [x] `notification-service` registered in the gateway and reachable via port 8000
+- [x] `REFLECTION.md` completed and committed
