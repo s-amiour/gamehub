@@ -1,7 +1,7 @@
 # Module 5 — Data Management & CQRS
 
 **Duration**: 2h in class
-**Branch to submit**: `module-05/<team-name>`
+**Branch to submit**: `module-05/s-amiour`
 
 ---
 
@@ -49,10 +49,12 @@ cd services/logging-service && pip install -r requirements.txt
 ## Part A — CQRS in game-service *(~40 min)*
 
 When a game is added, it writes to two places:
+
 - **SQLite** — the authoritative write model
 - **Redis** — a denormalised projection for fast reads
 
-Two endpoints serve the same game differently:
+Two endpoints serve the same game differently:\
+
 - `GET /v1/games/{id}` — reads from SQLite (full, accurate data)
 - `GET /v1/games/{id}/summary` — reads from Redis (fast, potentially stale)
 
@@ -99,21 +101,27 @@ Test the full flow in order:
 ## Discussion *(~15 min)*
 
 - You now have two models for a game's data. What happens if a game's title is updated in SQLite but the Redis projection is not refreshed? Who notices first — the developer or the user?
+> If the Redis memory is not refreshed, cache becomes stale. The user notices first, as their frontend will display the outdated cached data until the redis key is expired.
+
 - The GDPR consent check is inside `logging-service`, not at the gateway. Why there and not earlier in the chain?
+> The separation allows for the Separation of Concerns principle.
+
 - With CQRS, your write model and read model can drift. In what scenario does that inconsistency matter to the user? In what scenario is it completely acceptable?
+> Inconsistency matters when users expect immediate feedback like in updating profile name, adding friends, or changing passwords (to name a few). Conversely, it is not frowned upon in scenarios it is unnoticed and doesn't impact one's workflow (e.g. game summaries/game player counts).
 
 ---
 
 ## Minimum to submit this branch
 
-- [ ] `GET /v1/games/{id}/summary` returns data from Redis
-- [ ] All four consent endpoints working and reachable via the gateway
-- [ ] RabbitMQ consumer skips log entries when consent is not given
-- [ ] `logging-service` registered in the gateway under both `consent` and `logs`
-- [ ] `REFLECTION.md` completed and committed
+- [x] `GET /v1/games/{id}/summary` returns data from Redis
+- [x] All four consent endpoints working and reachable via the gateway
+- [x] RabbitMQ consumer skips log entries when consent is not given
+- [x] `logging-service` registered in the gateway under both `consent` and `logs`
+- [x] `REFLECTION.md` completed and committed
 
 ---
 
 > **Needs to be built before this module runs:**
-> - `services/game-service/app/infrastructure/cache.py` — Redis cache read/write scaffolding (write side implemented, `/summary` read side left as TODO)
-> - `services/logging-service/` — Flask skeleton with RabbitMQ consumer scaffolded and consent model stubbed out; students implement the four endpoints
+
+- `services/game-service/app/infrastructure/cache.py` — Redis cache read/write scaffolding (write side implemented, `/summary` read side left as TODO)
+- `services/logging-service/` — Flask skeleton with RabbitMQ consumer scaffolded and consent model stubbed out; students implement the four endpoints

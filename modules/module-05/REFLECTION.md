@@ -1,7 +1,7 @@
 # Module 5 — Reflection
 
-**Team name**: _______________
-**Branch**: `module-05/<team-name>`
+**Team name**: s-amiour
+**Branch**: `module-05/s-amiour`
 **Submitted**: before Module 6 lesson
 
 ---
@@ -18,7 +18,7 @@ The game-service now has two models for the same data: SQLite for writes, Redis 
 
 Think about what kind of queries each model is optimised for, and what would happen if you tried to use the write model for high-traffic read operations.
 
-> *Your answer:*
+> The main reason for CQRS (segragating DB model into two, each with a distinct responsability) is operation performance. The write model, SQLite, handles data integrity constraints and ACID transactions. On the other hand, the read model, Redis, is responsible for returning stored data as efficiently as possible by pre-computing and storing denormalized views to serve user's needs. If we force the write model to handle read operations as well, it is susceptible to performance bottlenecks due to the competition between the read queries and the write locks.
 
 ---
 
@@ -30,7 +30,7 @@ The logging-service checks GDPR consent before recording any activity. If a user
 
 From a system design perspective: where is the right place to enforce this rule — in the logging-service, in the activity-service, or at the gateway? Why?
 
-> *Your answer:*
+> This forces the system to be limited to only recording consented activity, thereby preventing it for storing global metrics. Inherently, the rule should be explicitly configured in the `logging-service`, as it separates operation concerns and allows for fast fire-and-forget operations without needing to somehow parse the request url further to access such rules, if they are stated in other services.
 
 ---
 
@@ -42,7 +42,7 @@ With CQRS, your write model and read model can drift out of sync — a game is u
 
 Is there a class of applications where eventual consistency is never acceptable? What are they?
 
-> *Your answer:*
+> Again, as mentioned in the the `Discussion` section of the `exercise.md` file, inconsistency is unacceptable in impactful operations like changing the username or password, whereas it is not harmful in scenarios of aggregate data like global leaderboards, hypothetically. Eventual consistency is unacceptable in systems requiring strict correctness and safety rules. Examples include healthcare/medical records (inconsistency in medications could lead to unreasonable decisions) and strict inventory booking (consistent details are vital for booking seats or rooms in reservations).
 
 ---
 
