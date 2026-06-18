@@ -2,6 +2,7 @@ import httpx
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request, Response
 from app.config import settings
+from jose import jwt, JWTError
 
 app = FastAPI(title="gateway", version="1.0.1")
 
@@ -19,7 +20,8 @@ ROUTES: dict[str, str] = {
     "activities": settings.activity_service_url,
     "notifications": settings.notification_service_url,
     "consent": settings.logging_service_url,
-    "logs": settings.logging_service_url
+    "logs": settings.logging_service_url,
+    "auth": settings.auth_service_url
 }
 
 
@@ -30,19 +32,29 @@ async def health():
 
 @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
 async def proxy(request: Request, path: str):
-    # Step 1 — parse the resource name from the path
+    if not path.startswith("v1/auth/token"):
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            return Response(status_code=401, content="Missing token")
+        token = auth_header.split(" ", 1)[1]
+        try:
+            jwt.decode(token, settings.secret_key, algorithms=settings.algorithm)
+        except JWTError:
+            return Response(status_code=401, content="Invalid or expired token")
+    
+    # Parse the resource name from the path
     segments = path.split("/")
     if len(segments) < 2:
         return Response(status_code=404, content="Not found")
 
     resource = segments[1]
 
-    # Step 2 — look up the target service
+    # Look up the target service
     target_base = ROUTES.get(resource)
     if target_base is None:
         return Response(status_code=404, content=f"Unknown resource: {resource}")
 
-    # Step 3 — forward the request
+    # Forward the request
     target_url = f"{target_base}/{path}"
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -59,6 +71,6 @@ async def proxy(request: Request, path: str):
             headers=dict(response.headers),
             media_type=response.headers.get("content-type"),
         )
-    # Step 4 — handle unreachable service
+    # Handle unreachable service
     except httpx.RequestError:
         return Response(status_code=503, content="Service unavailable")
