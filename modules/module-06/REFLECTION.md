@@ -1,7 +1,7 @@
 # Module 6 — Reflection
 
-**Team name**: _______________
-**Branch**: `module-06/<team-name>`
+**Team name**: s-amiour
+**Branch**: `module-06/s-amiour`
 **Submitted**: before Module 7 lesson
 
 ---
@@ -18,7 +18,7 @@ The gateway now validates every JWT before forwarding a request. Individual serv
 
 Think about what happens when you need to rotate the secret key, or add a new service to the system.
 
-> *Your answer:*
+> Centralizing authN at gateway creates a single point of enforcement, sig. simplifying the system since we don't implement redundant token validation logic in every service. If every service validated tokens independently, rotating the secret key given the possible addition of new services would be cumbersome and inefficient for maintainability.
 
 ---
 
@@ -30,7 +30,7 @@ When activity-service calls user-service internally, it uses a Machine-to-Machin
 
 What would break, or what door would you accidentally leave open, if services passed user tokens between themselves?
 
-> *Your answer:*
+> Reusing a user's token for internal network calls violates the principle of least privilege by giving the downstream service the dangerous ability to impersonate the user anywhere in the system. Using M2M tokens prevents lateral privilege escalation if a service is compromised.
 
 ---
 
@@ -42,7 +42,7 @@ The gateway and the auth-service share the same `SECRET_KEY` to verify tokens wi
 
 And what would the alternative look like — verifying tokens by calling auth-service on every request instead? What does that cost you?
 
-> *Your answer:*
+> Sharing the `SECRET_KEY` introduces a critical vulnerability where a leaked key allows an attacker to cryptographically forge valid JWTs and bypass the gateway's identity checks entirely. Calling the `auth-service` to verify every request eliminates the shared secret risk but introduces severe latency.
 
 ---
 

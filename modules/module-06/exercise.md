@@ -1,7 +1,7 @@
 # Module 6 — Security
 
 **Duration**: 2h in class
-**Branch to submit**: `module-06/<team-name>`
+**Branch to submit**: `module-06/s-amiour`
 
 ---
 
@@ -160,19 +160,24 @@ Read through `auth_client.py` to understand how it works, then confirm that crea
 ## Discussion *(~10 min)*
 
 - You implemented `create_access_token`. The gateway verifies tokens using only the `SECRET_KEY` — never by calling `auth-service`. Why does that work, and what does it tell you about JWTs?
+> JWT is self-contained and cryptographically signed, meaning the gateway can mathematically prove its authenticity locally if it possesses the shared `SECRET_KEY`. This shows that JWTs are designed for stateless auth.
+
 - The gateway checks identity. The service checks role. Why are those two responsibilities in different places?
+> Separation of Duties. The gateway handles global identity validation to protect the network perimeter. Role checking remains in the upstream services because only the specific service understands its own complex business rules. (e.g. only `admin` user can delete `/game_id`).
+
 - Why must `/v1/auth/token` stay public even though everything else requires a token?
+> The `/v1/auth/token` endpoint must remain public because it acts as the entrypoint to prove credentials and receive access token.
 
 ---
 
 ## Minimum to submit this branch
 
-- [ ] `create_access_token` and `get_current_user` implemented and working
-- [ ] `auth-service` running and issuing valid tokens
-- [ ] Gateway returns `401` for requests without a valid token
-- [ ] `/v1/auth/token` remains public
-- [ ] `DELETE /v1/games/{id}` returns `403` for gamer role, succeeds for admin role
-- [ ] M2M internal calls still work after gateway is locked
-- [ ] `REFLECTION.md` completed and committed
+- [x] `create_access_token` and `get_current_user` implemented and working
+- [x] `auth-service` running and issuing valid tokens
+- [x] Gateway returns `401` for requests without a valid token
+- [x] `/v1/auth/token` remains public
+- [x] `DELETE /v1/games/{id}` returns `403` for gamer role, succeeds for admin role
+- [x] M2M internal calls still work after gateway is locked
+- [x] `REFLECTION.md` completed and committed
 
 If you run out of time: Parts C and D are optional. Parts A and B are the core of this module.
