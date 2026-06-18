@@ -51,4 +51,7 @@ def has_consent(user_id: str) -> bool:
         if has_consent(payload["user_id"]):
             # store the log
     """
-    raise NotImplementedError
+    granted = db.session.query(Consent.granted).filter_by(user_id=user_id).scalar()
+    
+    # .scalar() returns the value of the column, or None if no row is found
+    return bool(granted)
