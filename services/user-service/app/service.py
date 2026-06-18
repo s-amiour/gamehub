@@ -4,9 +4,10 @@ from sqlalchemy.exc import IntegrityError
 from app import repository
 from app.schemas import UserCreate, UserOut, UserList
 
+from passlib.context import CryptContext
+
 def _hash_password(plain: str) -> str:
-    # for now a placeholder — swap for passlib in Module 6
-    return plain + "_hashed"
+    return CryptContext(schemes=["bcrypt"], deprecated="auto").hash(plain)
 
 def add_user(db: Session, data: UserCreate) -> UserOut:
     hashed = _hash_password(data.password)
