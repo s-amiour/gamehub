@@ -5,12 +5,15 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.database import Base, engine, get_db
 from app.infrastructure.rabbitmq_publisher import publish_activity_event
+from app.infrastructure.auth_client import get_auth_headers
 from app import repository, schemas
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="activity-service")
 
+
+# Helper functions
 # ---------------------------------------------------------------------------
 
 async def validate_user(user_id: str) -> None:
@@ -29,10 +32,12 @@ async def validate_user(user_id: str) -> None:
     Use `async with httpx.AsyncClient(timeout=5.0) as client:` for HTTP calls.
     This call is CRITICAL — the request must not proceed if validation fails.
     """
+    headers = await get_auth_headers()  # Fetch M2M headers
+
     for attempt in range(2):
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
-                response = await client.get(f"{settings.user_service_url}/v1/users/{user_id}")
+                response = await client.get(f"{settings.user_service_url}/v1/users/{user_id}", headers=headers)  # Include M2M headers to be authN'ed
             if response.status_code == 404:
                 raise HTTPException(status_code=404, detail="user not found")
             if response.status_code < 500:
@@ -57,9 +62,11 @@ async def fetch_game(game_id: str) -> dict | None:
     Graceful degradation is the goal: the response will include "game": null
     when game-service is unreachable.
     """
+    headers = await get_auth_headers()  # Fetch M2M headers
+
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            response = await client.get(f"{settings.game_service_url}/v1/games/{game_id}")
+            response = await client.get(f"{settings.game_service_url}/v1/games/{game_id}", headers=headers)  # Include M2M headers to be authN'ed
         if response.status_code == 200:
             return response.json()
         return None
@@ -67,8 +74,7 @@ async def fetch_game(game_id: str) -> dict | None:
         return None
 
 
-# ---------------------------------------------------------------------------
-# Endpoints — pre-written, they call your two functions above
+# Endpoints — Some call aforementioned helper functions
 # ---------------------------------------------------------------------------
 
 @app.get("/health")
